@@ -13,12 +13,12 @@ Although XenForo 2.0 adds a lot of improvements for your forums and its members,
 been put into improving the underlying framework of XenForo. You can read more information about these changes in
 the following threads:
 
- * <a href="https://xenforo.com/community/threads/xenforo-2-0-development-updates-from-xf2demo.139565/post-1205086" target="_blank">
- 	What's new for developers in XenForo 2 (part 1)
-   </a>
- * <a href="https://xenforo.com/community/threads/xenforo-2-0-development-updates-from-xf2demo.139565/post-1205088" target="_blank">
- 	What's new for developers in XenForo 2 (part 2)
-   </a>
+- <a href="https://xenforo.com/community/threads/xenforo-2-0-development-updates-from-xf2demo.139565/post-1205086" target="_blank">
+  What's new for developers in XenForo 2 (part 1)
+  </a>
+- <a href="https://xenforo.com/community/threads/xenforo-2-0-development-updates-from-xf2demo.139565/post-1205088" target="_blank">
+  What's new for developers in XenForo 2 (part 2)
+  </a>
 
 ## Getting started
 
@@ -37,9 +37,9 @@ accept the license agreement. Finally, click the Download button to download the
 
 The requirements for running XF 2.0 have changed since XF 1.5. The recommended requirements are as follows:
 
-* PHP: 5.4.0+
-* MySQL: 5.5+
-* PHP extensions: MySQLi, GD (with JPEG support), PCRE, SPL, SimpleXML, DOM, JSON, iconv, ctype, cURL
+- PHP: 5.4.0+
+- MySQL: 5.5+
+- PHP extensions: MySQLi, GD (with JPEG support), PCRE, SPL, SimpleXML, DOM, JSON, iconv, ctype, cURL
 
 [Download the requirements test script.](https://xenforo.com/purchase/requirements-zip)
 
@@ -53,13 +53,11 @@ It's often more convenient to set up a local web server for development. There a
 
 Setting things up yourself is more complicated, but tends to give you more control over how everything is set up.
 
-### Pre-built virtual machine
+Luckily, we have created some walkthroughs on how to setup a local dev environment for your favourite OS:
 
-There are a variety of pre-built virtual machines available on the Internet, which provide the advantage of having all of the necessary services to run XenForo neatly packaged into one place, without having to install and maintain them directly on your own computer.
-
-Some of the XenForo developers use a virtual machine called [Scotch Box](https://box.scotch.io/), which includes everything you need to run XenForo with zero configuration required. We have a [step-by-step guide](scotchbox.md) to getting a XenForo development server up and running - you can have a working virtual web and database server up and running in just a few minutes by running a handful of commands.
-
-[Installing Scotch Box for use with XenForo](scotchbox.md)
+* [macOS Dev Environment](macos-dev.md)
+* [Linux Dev Environment](linux-dev.md)
+* [Windows Dev Environment](windows-dev.md)
 
 ### Pre-built stack
 
@@ -77,7 +75,7 @@ Once extracted you will see a directory named `upload`. You need to go into
 that directory and upload the files and directories to your server's web root. This would usually be in a directory named
 `public_html`, `htdocs` or `www`.
 
-## Creating src/config.php
+## Creating `src/config.php`
 
 If using the CLI to install XF 2.0, you will need to create the config.php file manually. To do this, enter the `src` directory within the XF 2.0 files you uploaded to your server. Create a new file named config.php and populate it with the host, port, username, password and database name for your MySQL server.
 
@@ -86,7 +84,7 @@ If using the CLI to install XF 2.0, you will need to create the config.php file 
 
 Once finished, it should look like the following:
 
-```php
+```php title="src/config.php"
 <?php
 
 $config['db']['host'] = 'localhost';
@@ -100,7 +98,7 @@ You're now ready to install!
 
 If you are using MySQL 5.5 and above and you wish to have full unicode support (for things like emoji) you should also add the following before install:
 
-```php
+```php title="src/config.php"
 $config['fullUnicode'] = true;
 ```
 
@@ -128,8 +126,9 @@ XF 2.0 files.
 
 To start the install, just enter the below command:
 
-!!! terminal
-    *$* php cmd.php xf:install
+```sh title="Terminal"
+php cmd.php xf:install
+```
 
 You will be asked a number of questions, such as the initial administrator username and password, board title. After this,
 the XF 2.0 database tables and master data will be imported.
@@ -142,10 +141,11 @@ Occasionally it may be necessary to reinstall XF2. This is particularly true dur
 
 Before uploading the new files, you should delete the contents of your `data` and `internal_data` directories.
 
-Finally, you will just need to start the installation, similar to above. You will need to use the `--clear` option which will delete all of the existing xf_ tables.
+Finally, you will just need to start the installation, similar to above. You will need to use the `--clear` option which will delete all of the existing xf\_ tables.
 
-!!! terminal
-    *$* php cmd.php xf:install --clear
+```sh title="Terminal"
+php cmd.php xf:install --clear
+```
 
 Once the re-install has been completed, you should now be able to log back on.
 
@@ -160,8 +160,9 @@ If you have been developing add-ons, and you have chosen to keep or backup your 
 
 When you install XF2, we perform a file integrity check in the installation. If necessary, and you can't otherwise perform the check via the page in the Admin CP, you can run the CLI command to perform that check.
 
-!!! terminal
-    *$* php cmd.php xf:file-check _[addon_id]_
+```sh title="Terminal"
+php cmd.php xf:file-check [addon_id]
+```
 
 If you wish to do a file health check on all files, including XF itself, just omit the `[addon_id]` argument. For XF only, just use `XF` in place of the argument, or for a specific add-on, just specify the add-on ID you wish to check.
 
@@ -171,28 +172,32 @@ In addition to the above commands for installing XF2, there are also several com
 
 ### Install
 
-!!! terminal
-    *$* php cmd.php xf:addon-install _[addon_id]_
-
 Installs the specified add-on, as long as it is available, and passes the file health check. If development output is available, you will be asked to confirm if you wish to use that for the installation, instead of the exported data XML files.
+
+```sh title="Terminal"
+php cmd.php xf:addon-install [addon_id]
+```
 
 ### Upgrade
 
-!!! terminal
-    *$* php cmd.php xf:addon-upgrade _[addon_id]_
-
 Upgrades the specified add-on, as long as it is upgradeable, and passes the file health check. Can optionally perform import from development output.
+
+```sh title="Terminal"
+php cmd.php xf:addon-upgrade [addon_id]
+```
 
 ### Rebuild
 
-!!! terminal
-    *$* php cmd.php xf:addon-rebuild _[addon_id]_
-
 Rebuilds the master data for the specified add-on, as long as it is rebuildable, and passes the file health check. This re-imports the add-on's data. Can optionally perform import from development output.
+
+```sh title="Terminal"
+php cmd.php xf:addon-rebuild [addon_id]
+```
 
 ### Uninstall
 
-!!! terminal
-    *$* php cmd.php xf:addon-uninstall _[addon_id]_
-
 Uninstalls the specified add-on, as long as it is uninstallable.
+
+```sh title="Terminal"
+php cmd.php xf:addon-uninstall [addon_id]
+```

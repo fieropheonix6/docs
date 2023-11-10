@@ -4,9 +4,9 @@ When XenForo needs to test something (user/page/post...) against some **user sel
 
 Some places, where the Criteria system is used:
 
--   Trophies
--   User-group promotions
--   Forum notices
+- Trophies
+- User-group promotions
+- Forum notices
 
 Addons can also use this system.
 
@@ -14,17 +14,17 @@ Addons can also use this system.
 
 Consider the following criteria:
 
--   User has/has no avatar
--   User has more than 300 messages
--   User is creating a thread right now
--   Current user's selected navigation tab is "Members"
+- User has/has no avatar
+- User has more than 300 messages
+- User is creating a thread right now
+- Current user's selected navigation tab is "Members"
 
 The first two criteria refer to the user himself. The remaining ones refer to his current location on the forum. It appears we have different categories or **types** of criteria.
 
 There are two criteria types in XenForo out of the box:
 
--   User criteria — handling criteria about the user himself
--   Page criteria — handling criteria about user's current location + time criteria
+- User criteria — handling criteria about the user himself
+- Page criteria — handling criteria about user's current location + time criteria
 
 Some addons may also add their own criteria types.
 
@@ -44,7 +44,7 @@ Every criterion consists of two parts: **rule** and (optionally) **data**.
 
 ### Rule
 
-The criterion rule is simply a sting in [snake case](https://en.wikipedia.org/wiki/Snake_case) (words_are_separated_with_underscore_character).
+The criterion rule is simply a string in [snake case](https://en.wikipedia.org/wiki/Snake_case) (words_are_separated_with_underscore_character).
 
 It has two essential purposes:
 
@@ -55,9 +55,9 @@ It has two essential purposes:
 
 It is just an optional array of additional criterion data. For example, "User has posted at least X messages" criterion has a data array with one element: a number of messages.
 
-## How criteria system works
+## How the criteria system works
 
-In this sections, we describe how criteria system works from A to Z.
+In this sections, we describe how the criteria system works from A to Z.
 
 ### Template
 
@@ -65,23 +65,23 @@ It all starts from template code. Here is how criteria look inside templates:
 
 ```html
 <xf:checkbox label="Criteria container">
-    
+
     <!-- Criterion -->
     <xf:option name="foo_criteria[criterion_1_rule][rule]" value="criterion_1_rule" ... />
-    
+
     <!-- Criterion with data -->
     <xf:option name="bar_criteria[criterion_2_rule][rule]" value="criterion_2_rule" ... >
         <xf:... name="bar_criteria[criterion_2_rule][data][param_1]" ... />
         <xf:... name="bar_criteria[criterion_2_rule][data][param_2]" ... />
     </xf:option>
-        
+
 </xf:checkbox>
 ```
 
 As you can see, criterion is simply a checkbox with optional input fields inside (criterion data). Let's analyze the code:
 
--   `foo_criteria` and `bar_criteria` are the input containers and usually `foo` and `bar` parts refer to criteria type. For example, `user_criteria[...]` lets us know that this criteria belong to User criteria.
--   `value="criterion_1_rule"` and `value="criterion_2_rule"` are, obviously, the rules of criteria.
+- `foo_criteria` and `bar_criteria` are the input containers and usually `foo` and `bar` parts refer to criteria type. For example, `user_criteria[...]` lets us know that this criteria belong to User criteria.
+- `value="criterion_1_rule"` and `value="criterion_2_rule"` are, obviously, the rules of criteria.
 
 !!! note
     Keep in mind that `criterion_1/2_rule` in `name` attributes may not have to be criteria rules! These are just names for input containers. You can easily write `<xf:option name="foo[bar][rule]" value="criterion_rule" />` and it will work correctly. The criterion rule will be `criterion_rule`, not `bar`.
@@ -149,7 +149,7 @@ else
 }
 ```
 
-`isMacthed()` converts criterion rule into camel case name of a method with `_match` prefix: `criterion_1_rule` > `_matchCriterion1Rule` and tries to find such a method inside criteria type class (`Foo` class in our example):
+`isMatched()` converts criterion rule into camel case name of a method with `_match` prefix: `criterion_1_rule` > `_matchCriterion1Rule` and tries to find such a method inside criteria type class (`Foo` class in our example):
 
 ```php
 // Qux/Criteria/Foo.php
@@ -157,11 +157,11 @@ else
 protected function _matchCriterion1Rule(array $data, \XF\Entity\User $user)
 {
     /* ... Handling criteria ... */
-    
+
     return true; // User matches current criteria
-    
+
     /* OR */
-    
+
     return false; // User does not match current criteria
 }
 ```
@@ -195,27 +195,29 @@ Your selected criteria stores in `user_criteria` column in `xf_trophy` table.
 
 When XenForo decides to check, whether to award a user with a trophy or not, it converts rules into camel case method names:
 
--   `like_count` > `_matchLikeCount()`
--   `has_avatar` > `_matchHasAvatar()`
+- `like_count` > `_matchLikeCount()`
+- `has_avatar` > `_matchHasAvatar()`
 
 Since both of selected criteria are User criteria, XenForo addresses the User criteria class and tries to find such methods in it:
 
-```php
-// XF/Criteria/User.php
-
+```php title="src/XF/Criteria/User.php"
 //...
+
 protected function _matchLikeCount(array $data, \XF\Entity\User $user)
 {
     return ($user->like_count && $user->like_count >= $data['likes']);
 }
+
 //...
+
 protected function _matchHasAvatar(array $data, \XF\Entity\User $user)
 {
     return $user->user_id && ($user->avatar_date || $user->gravatar);
 }
+
 //...
 ```
- 
+
 If **all** addressed methods return `true`, our user matches the selected criteria and therefore will be awarded with a trophy.
 
 If some methods can't be found in User criteria class, XenForo calls `isUnknownMatched()` method, which in turn fires `criteria_user` event, allowing addon makers to add their custom criteria handlers (see ["Custom User/Page criterion example"](#custom-userpage-criterion-example)).
@@ -263,7 +265,7 @@ public static function criteriaTemplateData(array &$templateData)
 ```
 
 ## "helper_criteria" template
- 
+
 Whenever you as addon maker want to get a target user/admin a way to select User/Page/other addon's criteria (or even all at once), you can simply use `helper_criteria`.
 
 In short, `helper_criteria` is an admin template that allows to use criteria types checkbox-based interface in multiply places without copy-pasting the same code.
@@ -317,7 +319,7 @@ Just like tabs, panes in `helper_criteria` are grouped under criteria types macr
 				<xf:option name="foo_criteria[criterion_1_rule][rule]" value="criterion_1_rule" ... />
 			    <xf:option name="foo_criteria[criterion_2_rule][rule]" value="criterion_2_rule" ... />
 			</xf:checkboxrow>
-			
+
 			<xf:checkboxrow label="Criteria group 2">
                 <xf:option name="foo_criteria[criterion_3_rule][rule]" value="criterion_3_rule" ... />
                 <xf:option name="foo_criteria[criterion_4_rule][rule]" value="criterion_4_rule" ... />
@@ -360,7 +362,7 @@ $viewParams = [
     'criteria' => $criteria,
     'criteriaData' => $criteriaData
 ];
-    
+
 return $this->view(/* ... */, $viewParams);
 ```
 
@@ -383,13 +385,13 @@ In order to use criteria tabs, you will need to organise the page. Stick to the 
 ```html
 <xf:form ... class="block">
 	<div class="block-container">
-	    
+
 	    <!-- Tabs -->
 		<h2 class="block-tabHeader tabs hScroller" data-xf-init="h-scroller tabs" role="tablist">
 			<span class="hScroller-scroll">
 			    <!-- Main tab where fields/options are located -->
 				<a class="tabs-tab is-active" role="tab" tabindex="0" aria-controls="MAIN_TAB_ID">Main tab title</a>
-				
+
 				<!-- Criteria tabs -->
 				<xf:macro template="helper_criteria" name="page_tabs" arg-userTabTitle="Custom tab name (optionally)" />
 			</span>
@@ -452,7 +454,7 @@ Finally, add the tab and the pane macros code in "Replace" field. Example:
 				<xf:option name="foo_criteria[criterion_1_rule][rule]" value="criterion_1_rule" ... />
 			    <xf:option name="foo_criteria[criterion_2_rule][rule]" value="criterion_2_rule" ... />
 			</xf:checkboxrow>
-			
+
 			<xf:checkboxrow label="Criteria group 2">
                 <xf:option name="foo_criteria[criterion_3_rule][rule]" value="criterion_3_rule" ... />
                 <xf:option name="foo_criteria[criterion_4_rule][rule]" value="criterion_4_rule" ... />
@@ -485,7 +487,7 @@ First of all, we need to add our criterion to User criteria list. Go to "Templat
 
 !!! warning
     If there is no "Admin" tab make sure you have enabled the [development mode](development-tools.md#enabling-development-mode)!
-    
+
 We will be modifying the `helper_criteria` template so write it to the "Template" field. In this example I will be using `likes_on_single_message` "Modification key" for this template modification.
 
 Our criterion is about likes on messages. This means it should be under "Content and achievements" section. This means we simply need to find `<!--[XF:user:content_bottom]-->` and replace it with the following code:
@@ -502,7 +504,7 @@ From this moment we can already see and even set a value for our criterion when 
 
 ### Adding code event listener
 
-We have created our criterion. But it is unknown for XenForo, which will always return `false` when matching such criteria. We need to tell XenForo, what to do when it meets unknown criteria. 
+We have created our criterion. But it is unknown for XenForo, which will always return `false` when matching such criteria. We need to tell XenForo, what to do when it meets unknown criteria.
 
 Go to "Development > Code event listener" page and hit "Add code event listener" button.
 
@@ -519,7 +521,7 @@ class Listener
 {
     public static function criteriaUser($rule, array $data, \XF\Entity\User $user, &$returnValue)
     {
-        
+
     }
 }
 ```
@@ -585,8 +587,8 @@ public static function criteriaUser($rule, array $data, \XF\Entity\User $user, &
 
 Pay attention to the following:
 
--   We are using `$user` variable for retrieving currently matching user. We can use this variable since our criterion belongs to **User** criteria.
--   We can access data via `$data` array. It contains data from fields [we have added](#adding-template-modification) in template modification. We have only added one `<xf:numberbox...` which `name` attribute equals `user_criteria[likes_on_single][data][likes]`. That is why we can use `$data['likes']` in the code above.
+- We are using `$user` variable for retrieving currently matching user. We can use this variable since our criterion belongs to **User** criteria.
+- We can access data via `$data` array. It contains data from fields [we have added](#adding-template-modification) in template modification. We have only added one `<xf:numberbox...` which `name` attribute equals `user_criteria[likes_on_single][data][likes]`. That is why we can use `$data['likes']` in the code above.
 
 Everything is done right now. Let's test it!
 
@@ -621,12 +623,12 @@ You can [download](files/example-sources/all-for-one-criterion-2.0.10.zip) addon
 
 Imagine we are creating an addon (addon ID: `PostsRemover`) for removing all posts that match selected criteria. A list of available criteria:
 
--   Post has at least X likes
--   Post author has an X username
--   Post was edited at least X times
--   Post was edited no more than X times
--   Post was published before X
--   Post was published after X
+- Post has at least X likes
+- Post author has an X username
+- Post was edited at least X times
+- Post was edited no more than X times
+- Post was published before X
+- Post was published after X
 
 Obviously, for such criteria we need a new criteria type: Post criteria.
 
@@ -743,7 +745,6 @@ We simply used `isMatched(...)` method code replacing `$user` variable of User e
 
 As we do not plan to handle special and unknown criteria we return null in `isSpecialMatchedPost` and `false` in `isUnknownMathcedPost` methods.
 
-
 ### Template
 
 Leaving the process of adding an admin route, writing a controller and doing other actions behind the scenes, let's jump right to our page's template code:
@@ -768,9 +769,9 @@ Leaving the process of adding an admin route, writing a controller and doing oth
 			</xf:option>
 
 		</xf:checkboxrow>
-		
+
 		<!-- Template code for other criteria -->
-		
+
 		<xf:submitrow sticky="true" icon="delete"/>
 	</div>
 </xf:form>
@@ -858,7 +859,7 @@ public function actionRemove()
 !!! warning
     It is generally a bad practice to retrieve all entities from database at once (`$this->finder('XF:Post')->fetch();` in the code above). There could be millions of forum posts and selecting them all at once is going to be a very long process, which might end up with an error.
     Consider using a Job system for working with dozens (100+) of database items.
-    
+
 ### Testing
 
 Time to test our custom criteria type!
